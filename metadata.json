@@ -1,0 +1,5 @@
+{
+  "name": "DynamicCPQ",
+  "description": "An LLM-driven CPQ solver with a hybrid architecture: LLM for rule ingestion/suggestions and a deterministic engine for validation.",
+  "requestFramePermissions": []
+}
