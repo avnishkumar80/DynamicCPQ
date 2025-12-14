@@ -3,9 +3,8 @@ import { Rule, Configuration, ValidationViolation, ProductAttribute } from '../t
 
 // NOTE: In a real environment, this API key would come from a secure backend proxy or properly injected env var.
 // The prompt instructions specify using process.env.API_KEY directly.
-const API_KEY = process.env.API_KEY || ''; 
 
-const ai = new GoogleGenAI({ apiKey: API_KEY });
+const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 const MOCK_EXTRACTED_RULES: Rule[] = [
   {
@@ -35,7 +34,7 @@ const MOCK_EXTRACTED_RULES: Rule[] = [
 ];
 
 export const extractRulesFromText = async (text: string, attributes: ProductAttribute[]): Promise<Rule[]> => {
-  if (!API_KEY) {
+  if (!process.env.API_KEY) {
     console.warn("No API Key found. Returning mock extraction.");
     await new Promise(resolve => setTimeout(resolve, 1500));
     return MOCK_EXTRACTED_RULES;
@@ -121,7 +120,7 @@ export const extractRulesFromText = async (text: string, attributes: ProductAttr
 };
 
 export const getFixSuggestions = async (config: Configuration, violations: ValidationViolation[]): Promise<string> => {
-   if (!API_KEY) {
+   if (!process.env.API_KEY) {
     await new Promise(resolve => setTimeout(resolve, 1000));
     return "Suggestion (Mock): Based on the violation, consider upgrading the Cooling Unit to ACM-500 to match the high horsepower motor selected.";
   }
