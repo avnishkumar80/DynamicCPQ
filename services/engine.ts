@@ -1,4 +1,4 @@
-import { Configuration, Rule, ValidationResult, ValidationViolation } from '../types';
+import { Configuration, Rule, ValidationResult, ValidationViolation, ProductAttribute } from '../types';
 
 export const evaluateCondition = (value: any, operator: string, target: any): boolean => {
   if (value === undefined || value === null) return false;
@@ -15,9 +15,31 @@ export const evaluateCondition = (value: any, operator: string, target: any): bo
   }
 };
 
-export const validateConfiguration = (config: Configuration, rules: Rule[]): ValidationResult => {
+export const validateConfiguration = (
+  config: Configuration, 
+  rules: Rule[], 
+  attributes: ProductAttribute[] = []
+): ValidationResult => {
   const violations: ValidationViolation[] = [];
 
+  // 1. Schema Validation (Required Fields)
+  for (const attr of attributes) {
+    if (attr.required) {
+      const val = config[attr.id];
+      const isEmpty = val === undefined || val === null || val === '';
+      if (isEmpty) {
+        violations.push({
+          rule_id: 'schema-validation',
+          message: `${attr.name} is required.`,
+          severity: 'error',
+          source: 'System Schema',
+          involvedAttributes: [attr.id]
+        });
+      }
+    }
+  }
+
+  // 2. Rule Validation
   for (const rule of rules) {
     if (!rule.approved) continue;
 
@@ -36,20 +58,20 @@ export const validateConfiguration = (config: Configuration, rules: Rule[]): Val
               rule_id: rule.id,
               message: rule.natural_text,
               severity: 'error',
-              source: rule.source_doc
+              source: rule.source_doc,
+              involvedAttributes: [rule.condition.attribute, rule.consequence.attribute]
             });
           }
         }
       } else if (rule.type === 'exclusion') {
         // IF condition THEN invalid (Mutual Exclusion)
-        // Usually exclusion rules might have complex structure, simplifying here to:
-        // If condition matches, it is invalid.
         if (conditionMet) {
              violations.push({
               rule_id: rule.id,
               message: rule.natural_text,
               severity: 'error',
-              source: rule.source_doc
+              source: rule.source_doc,
+              involvedAttributes: [rule.condition.attribute]
             });
         }
       }

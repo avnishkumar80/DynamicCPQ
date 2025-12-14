@@ -3,6 +3,8 @@ export interface ProductAttribute {
   name: string;
   type: 'number' | 'string' | 'boolean';
   options?: { label: string; value: any }[];
+  required?: boolean;
+  defaultValue?: any;
 }
 
 export interface Configuration {
@@ -34,6 +36,7 @@ export interface ValidationViolation {
   message: string;
   severity: 'error' | 'warning';
   source?: string;
+  involvedAttributes?: string[];
 }
 
 export interface ValidationResult {

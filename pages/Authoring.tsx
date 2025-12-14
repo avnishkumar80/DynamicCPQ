@@ -87,11 +87,19 @@ const Authoring: React.FC<AuthoringProps> = ({ rules, setRules, attributes }) =>
                 {attributes.map(attr => (
                     <div key={attr.id} className="text-sm">
                         <div className="flex items-center justify-between">
-                            <span className="font-semibold text-gray-700">{attr.name}</span>
+                            <span className="font-semibold text-gray-700">
+                              {attr.name}
+                              {attr.required && <span className="text-red-500 ml-1 text-xs">*</span>}
+                            </span>
                             <span className="text-xs font-mono bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">{attr.id}</span>
                         </div>
                         <div className="mt-1 pl-2 border-l-2 border-gray-100 text-xs text-gray-500">
-                            Type: {attr.type}
+                            Type: {attr.type} {attr.required ? '(Required)' : '(Optional)'}
+                            {attr.defaultValue !== undefined && (
+                                <span className="ml-2 text-indigo-600 bg-indigo-50 px-1.5 rounded">
+                                    Default: {String(attr.defaultValue)}
+                                </span>
+                            )}
                             {attr.options && (
                                 <div className="mt-1 text-gray-400">
                                     Options: {attr.options.map(o => o.value).join(', ')}
