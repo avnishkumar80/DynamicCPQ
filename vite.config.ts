@@ -14,7 +14,8 @@ export default defineConfig(({ mode }) => {
       port: 7860,
       watch: {
         usePolling: true
-      }
+      },
+      allowedHosts: ['avnishkumar80-llmdrivencpq.hf.space']
     }
   };
 });
