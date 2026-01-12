@@ -1,8 +1,12 @@
 import { Configuration, Rule, ValidationResult, ValidationViolation, ProductAttribute } from '../types';
 
+export interface ValidationEngine {
+  validate(config: Configuration, rules: Rule[], attributes: ProductAttribute[]): Promise<ValidationResult> | ValidationResult;
+}
+
 export const evaluateCondition = (value: any, operator: string, target: any): boolean => {
   if (value === undefined || value === null) return false;
-  
+
   switch (operator) {
     case '>': return Number(value) > Number(target);
     case '>=': return Number(value) >= Number(target);
@@ -15,9 +19,9 @@ export const evaluateCondition = (value: any, operator: string, target: any): bo
   }
 };
 
-export const validateConfiguration = (
-  config: Configuration, 
-  rules: Rule[], 
+export const validateDeterministic = (
+  config: Configuration,
+  rules: Rule[],
   attributes: ProductAttribute[] = []
 ): ValidationResult => {
   const violations: ValidationViolation[] = [];
@@ -66,13 +70,13 @@ export const validateConfiguration = (
       } else if (rule.type === 'exclusion') {
         // IF condition THEN invalid (Mutual Exclusion)
         if (conditionMet) {
-             violations.push({
-              rule_id: rule.id,
-              message: rule.natural_text,
-              severity: 'error',
-              source: rule.source_doc,
-              involvedAttributes: [rule.condition.attribute]
-            });
+          violations.push({
+            rule_id: rule.id,
+            message: rule.natural_text,
+            severity: 'error',
+            source: rule.source_doc,
+            involvedAttributes: [rule.condition.attribute]
+          });
         }
       }
     } catch (e) {
@@ -85,3 +89,6 @@ export const validateConfiguration = (
     violations
   };
 };
+
+// Default export for backward compatibility if needed, though we will update consumers
+export const validateConfiguration = validateDeterministic;
